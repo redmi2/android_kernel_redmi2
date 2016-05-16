@@ -1,4 +1,5 @@
 /* Copyright (c) 2008-2016, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2016 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -218,6 +219,7 @@ struct msm_fb_data_type {
 	u32 dest;
 	struct fb_info *fbi;
 
+	int dispparam_level;
 	int idle_time;
 	struct delayed_work idle_notify_work;
 
