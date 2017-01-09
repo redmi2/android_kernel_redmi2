@@ -1304,7 +1304,8 @@ void mdss_fb_update_backlight(struct msm_fb_data_type *mfd)
 				mdss_fb_scale_bl(mfd, &temp);
 			pdata->set_backlight(pdata, temp);
 			mfd->bl_level_scaled = mfd->unset_bl_level;
-			mdss_fb_bl_update_notify(mfd);
+                        mdss_fb_bl_update_notify(mfd,
+                                NOTIFY_TYPE_BL_AD_ATTEN_UPDATE);
 			mfd->allow_bl_update = true;
 		}
 	}

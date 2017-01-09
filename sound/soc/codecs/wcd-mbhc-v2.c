@@ -30,6 +30,9 @@
 #include <sound/soc.h>
 #include <sound/jack.h>
 #include "wcd-mbhc-v2.h"
+#include "msm8x16_wcd_registers.h"
+#include "msm8916-wcd-irq.h"
+#include "msm8x16-wcd.h"
 #include "wcdcal-hwdep.h"
 
 #define WCD_MBHC_JACK_MASK (SND_JACK_HEADSET | SND_JACK_OC_HPHL | \
@@ -528,6 +531,7 @@ int wcd_mbhc_get_impedance(struct wcd_mbhc *mbhc, uint32_t *zl,
 static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 				enum snd_jack_types jack_type)
 {
+	struct snd_soc_codec *codec = mbhc->codec;
 	WCD_MBHC_RSC_ASSERT_LOCKED(mbhc);
 
 	pr_debug("%s: enter insertion %d hph_status %x\n",
@@ -1203,12 +1207,15 @@ exit:
 static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 {
 	struct snd_soc_codec *codec = mbhc->codec;
+	long timeout = msecs_to_jiffies(50);   /* 50ms */
 	enum wcd_mbhc_plug_type plug_type;
 	bool micbias1 = false;
 	int cross_conn;
 	int try = 0;
 	int i = 0;
 	bool is_pa_on;
+	int timeout_result;
+	u16 result1, result2;
 
 	pr_debug("%s: enter\n", __func__);
 	WCD_MBHC_RSC_ASSERT_LOCKED(mbhc);
@@ -1277,6 +1284,7 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 				goto exit;
 			}
 		}
+        }
 
 	if (mbhc->mbhc_cb->mbhc_micbias_control)
 		mbhc->mbhc_cb->mbhc_micbias_control(codec, MICB_ENABLE);
@@ -1301,6 +1309,17 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 	/* Re-initialize button press completion object */
 	reinit_completion(&mbhc->btn_press_compl);
 	wcd_schedule_hs_detect_plug(mbhc, &mbhc->correct_plug_swch);
+	pr_debug("%s: leave\n", __func__);
+exit:
+	pr_debug("%s: Valid plug found, plug type is %d\n",
+			 __func__, plug_type);
+	if (plug_type == MBHC_PLUG_TYPE_HEADSET ||
+			plug_type == MBHC_PLUG_TYPE_HEADPHONE) {
+		wcd_mbhc_find_plug_and_report(mbhc, plug_type);
+		wcd_schedule_hs_detect_plug(mbhc, &mbhc->correct_plug_swch);
+	} else {
+		wcd_schedule_hs_detect_plug(mbhc, &mbhc->correct_plug_swch);
+	}
 	pr_debug("%s: leave\n", __func__);
 }
 

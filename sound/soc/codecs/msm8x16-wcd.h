@@ -322,8 +322,11 @@ extern int msm8x16_wcd_hs_detect(struct snd_soc_codec *codec,
 
 extern void msm8x16_wcd_hs_detect_exit(struct snd_soc_codec *codec);
 
+/*
 extern int msm8x16_register_notifier(struct snd_soc_codec *codec,
-				     struct notifier_block *nblock);
+				     struct notifier_block *nblock,
+                                     bool enable);
+                                     */
 
 extern int msm8x16_unregister_notifier(struct snd_soc_codec *codec,
 					 struct notifier_block *nblock);
