@@ -951,6 +951,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	bool is_pa_on = false;
 	bool micbias2 = false;
 	bool micbias1 = false;
+	u16 detection_type_read;
 	bool detection_type;
 	int ret = 0;
 	int rc;
@@ -960,9 +961,8 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	mbhc = container_of(work, struct wcd_mbhc, correct_plug_swch);
 	codec = mbhc->codec;
 
-	detection_type = (snd_soc_read(codec,
-				MSM8X16_WCD_A_ANALOG_MBHC_DET_CTL_1)) & 0x20;
-
+	WCD_MBHC_REG_READ(MSM8X16_WCD_A_ANALOG_MBHC_DET_CTL_1,detection_type_read);
+	detection_type = detection_type_read & 0x20;
 	if (detection_type)
 		return;
 
