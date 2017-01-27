@@ -292,8 +292,6 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 		}
 		/* configure cap settings properly when micbias is enabled */
-		if (mbhc->mbhc_cb->set_cap_mode)
-			mbhc->mbhc_cb->set_cap_mode(codec, micbias1, true);
 		break;
 	case WCD_EVENT_PRE_MICBIAS_2_OFF:
 		/*
@@ -333,6 +331,8 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 
 		/* configure cap settings properly when micbias is disabled */
+		if (mbhc->mbhc_cb->set_cap_mode)
+			mbhc->mbhc_cb->set_cap_mode(codec, micbias1, false);
 		break;
 	case WCD_EVENT_PRE_HPHL_PA_OFF:
 		mutex_lock(&mbhc->hphl_pa_lock);
